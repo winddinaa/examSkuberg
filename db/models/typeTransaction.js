@@ -1,16 +1,14 @@
+// models/typeTransaction.js
 module.exports = async (sequelize, DataTypes) => {
-  const CryptoBag = await sequelize.define(
-    "cryptoBags",
+  const TypeTransaction = await sequelize.define(
+    "typeTransaction",
     {
-      cryptoBagID: {
+      typeTransactionID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      userID: { type: DataTypes.INTEGER, allowNull: false },
-      cryptoID: { type: DataTypes.INTEGER, allowNull: false },
-      amount: { type: DataTypes.DECIMAL(20, 8), allowNull: false },
-      pendingAmount: { type: DataTypes.DECIMAL(20, 8), allowNull: false },
+      statusName: { type: DataTypes.STRING, allowNull: false },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -23,9 +21,8 @@ module.exports = async (sequelize, DataTypes) => {
     {
       freezeTableName: true,
       timestamps: false,
-      // ถ้าคุณไม่ต้องการให้ Sequelize สร้างคอลัมน์ createdAt และ updatedAt ให้กำหนด timestamps เป็น false
     }
   );
 
-  return CryptoBag;
+  return TypeTransaction;
 };

@@ -14,8 +14,7 @@ router.post(path + "/auth/login", async (req, res) => {
       raw: true,
       where: { username: username },
     });
-    console.log("user======", user);
-    console.log("req?.body======", req?.body);
+
     if (
       !isEmpty(user) &&
       user.username == username &&
@@ -30,7 +29,6 @@ router.post(path + "/auth/login", async (req, res) => {
       return res.status(400).json("invalid username or password");
     }
   } catch (error) {
-    console.log("error", error);
     return resError(error, res);
   }
 });

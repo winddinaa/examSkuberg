@@ -11,7 +11,6 @@ module.exports = async (sequelize, DataTypes) => {
       fiatID: { type: DataTypes.INTEGER, allowNull: false },
       amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       pendingAmount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-      totalAmount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,

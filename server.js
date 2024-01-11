@@ -44,7 +44,6 @@ const initializeServer = async () => {
 
   globSync("./api/**/*.js").forEach((file) => {
     const customFile = file.replace(/\\/g, "/").replace("api", "./api");
-    console.log("customFile", customFile);
     server.use((req, res, next) => {
       require(customFile)(req, res, next);
     });

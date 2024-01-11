@@ -73,7 +73,6 @@ const initCrypto = [
 const initDefaultCryptoBag = {
   amount: 10,
   pendingAmount: 0.0,
-  totalAmount: 10.0,
   created_by: 99999,
   updated_at: new Date(),
   updated_by: 99999,
@@ -82,7 +81,6 @@ const initDefaultCryptoBag = {
 const initDefaultFiatBag = {
   amount: 1000000,
   pendingAmount: 0.0,
-  totalAmount: 1000000.0,
   created_by: 99999,
   updated_at: new Date(),
   updated_by: 99999,
@@ -109,6 +107,33 @@ const initStatus = [
   },
 ];
 
+const initTypeTransaction = [
+  {
+    statusName: "transfer",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+  {
+    statusName: "transferOrder",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+  {
+    statusName: "buy",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+  {
+    statusName: "sell",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+];
+
 const initializeServer = async () => {
   await initDb();
 
@@ -120,6 +145,13 @@ const initializeServer = async () => {
     const destroyUsers = await model.users.destroy({
       where: {
         userID: { [Op.gt]: 0 },
+      },
+      transaction,
+    });
+
+    const destroyTypeTransaction = await model.typeTransaction.destroy({
+      where: {
+        typeTransactionID: { [Op.gt]: 0 },
       },
       transaction,
     });
@@ -152,12 +184,12 @@ const initializeServer = async () => {
       transaction,
     });
 
-    const destroyStatus = await model.status.destroy({
-      where: {
-        statusID: { [Op.gt]: 0 },
-      },
-      transaction,
-    });
+    // const destroyStatus = await model.status.destroy({
+    //   where: {
+    //     statusID: { [Op.gt]: 0 },
+    //   },
+    //   transaction,
+    // });
 
     // Add data to table
     await Promise.all(
@@ -178,9 +210,17 @@ const initializeServer = async () => {
       })
     );
 
+    // await Promise.all(
+    //   initStatus.map(async (itemStatus) => {
+    //     await model.status.create(itemStatus, { transaction });
+    //   })
+    // );
+
     await Promise.all(
-      initStatus.map(async (itemStatus) => {
-        await model.status.create(itemStatus, { transaction });
+      initTypeTransaction.map(async (itemTypeTransaction) => {
+        await model.typeTransaction.create(itemTypeTransaction, {
+          transaction,
+        });
       })
     );
 
@@ -231,6 +271,7 @@ const initializeServer = async () => {
     console.log("destroyCryptoBags===>", destroyCryptoBags);
     console.log("destroyFiatBags===>", destroyFiatBags);
     console.log("destroyStatus===>", destroyStatus);
+    console.log("destroyTypeTransaction===>", destroyTypeTransaction);
 
     // console.log("checkFiat===>", checkFiat);
     // console.log("checkFiat===>", checkFiat);

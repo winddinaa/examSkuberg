@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
       if (err) {
         return res.status(403).json(err);
       } else {
-        req.user = user;
+        req.userID = user?.userID;
       }
     });
 

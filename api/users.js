@@ -51,7 +51,6 @@ router.post(path + "/users/mock", async (req, res) => {
               },
               { transaction }
             );
-            console.log("newUser1======", newUser.dataValues.userID);
             if (!isEmpty(newUser.dataValues.userID)) {
               const crypto = await model.crypto.findAll({
                 transaction,
@@ -104,7 +103,6 @@ router.post(path + "/users/mock", async (req, res) => {
       }
     }
   } catch (error) {
-    console.log("error====", error);
     return res.status(500).json(error);
   }
 });

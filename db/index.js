@@ -25,7 +25,6 @@ const initDb = async () => {
         .replace(".js", "")
         .replace(/\\/g, "/")
         .replace("db", ".");
-      console.log("pathModel", pathModel);
       const fileName = file
         .replace(".js", "")
         .replace(/\\/g, "/")
