@@ -5,6 +5,7 @@ const cors = require("cors");
 const { globSync } = require("glob");
 const logger = require("morgan");
 const initDb = require("./db");
+const { authenticateToken } = require("./utils/auth");
 
 //โหลด env จาก env
 dotenv.config();
@@ -20,6 +21,7 @@ const corsOptions = {
 global.appRoot = path.resolve(__dirname).replace(/\\/g, "/");
 global.express = express;
 global.model = {};
+global.authenticateToken = authenticateToken; //authen api
 
 const server = express();
 const initializeServer = async () => {
