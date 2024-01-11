@@ -4,7 +4,7 @@ const path = require("path")
   .replace(/\\/g, "/")
   .replace(appRoot, "");
 
-router.get(path + "/auth/test", async (req, res) => {
+router.post(path + "/order", async (req, res) => {
   try {
     return res.status(200).json("test");
   } catch (error) {}

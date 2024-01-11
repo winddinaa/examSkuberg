@@ -70,7 +70,7 @@ const initCrypto = [
     updated_by: 99999,
   },
 ];
-const initDefalutCryptoBag = {
+const initDefaultCryptoBag = {
   amount: 10,
   pendingAmount: 0.0,
   totalAmount: 10.0,
@@ -79,7 +79,7 @@ const initDefalutCryptoBag = {
   updated_by: 99999,
 };
 
-const initDefalutFiatBag = {
+const initDefaultFiatBag = {
   amount: 1000000,
   pendingAmount: 0.0,
   totalAmount: 1000000.0,
@@ -87,6 +87,27 @@ const initDefalutFiatBag = {
   updated_at: new Date(),
   updated_by: 99999,
 };
+
+const initStatus = [
+  {
+    statusName: "pending",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+  {
+    statusName: "success",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+  {
+    statusName: "cancel",
+    created_by: 99999,
+    updated_at: new Date(),
+    updated_by: 99999,
+  },
+];
 
 const initializeServer = async () => {
   await initDb();
@@ -131,6 +152,13 @@ const initializeServer = async () => {
       transaction,
     });
 
+    const destroyStatus = await model.status.destroy({
+      where: {
+        statusID: { [Op.gt]: 0 },
+      },
+      transaction,
+    });
+
     // Add data to table
     await Promise.all(
       initUser.map(async (itemUser) => {
@@ -150,6 +178,12 @@ const initializeServer = async () => {
       })
     );
 
+    await Promise.all(
+      initStatus.map(async (itemStatus) => {
+        await model.status.create(itemStatus, { transaction });
+      })
+    );
+
     const crypto = await model.crypto.findAll({ transaction, raw: true });
     const fiat = await model.fiat.findAll({ transaction, raw: true });
 
@@ -165,7 +199,7 @@ const initializeServer = async () => {
                     {
                       userID: itemUser.userID,
                       cryptoID: itemCrypto.cryptoID,
-                      ...initDefalutCryptoBag,
+                      ...initDefaultCryptoBag,
                     },
                     { transaction }
                   );
@@ -178,7 +212,7 @@ const initializeServer = async () => {
                     {
                       userID: itemUser.userID,
                       fiatID: itemFiat.fiatID,
-                      ...initDefalutFiatBag,
+                      ...initDefaultFiatBag,
                     },
                     { transaction }
                   );
@@ -196,6 +230,7 @@ const initializeServer = async () => {
     console.log("destroyCrypto===>", destroyCrypto);
     console.log("destroyCryptoBags===>", destroyCryptoBags);
     console.log("destroyFiatBags===>", destroyFiatBags);
+    console.log("destroyStatus===>", destroyStatus);
 
     // console.log("checkFiat===>", checkFiat);
     // console.log("checkFiat===>", checkFiat);
