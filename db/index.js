@@ -29,7 +29,7 @@ const initDb = async () => {
       const fileName = file
         .replace(".js", "")
         .replace(/\\/g, "/")
-        .replace("server/db/models/", "");
+        .replace("db/models/", "");
       const modelDatabase = require(pathModel);
       const funcModel = await modelDatabase(sequelize, DataTypes);
       global.model[fileName] = funcModel;

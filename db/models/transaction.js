@@ -1,6 +1,6 @@
 module.exports = async (sequelize, DataTypes) => {
   const Transaction = await sequelize.define(
-    "Transaction",
+    "transaction",
     {
       transactionID: {
         type: DataTypes.INTEGER,

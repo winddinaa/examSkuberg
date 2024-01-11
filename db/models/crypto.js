@@ -8,7 +8,7 @@ module.exports = async (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       currencyName: { type: DataTypes.STRING, allowNull: false },
-      price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+      price: { type: DataTypes.DECIMAL(20, 2), allowNull: false },
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
