@@ -6,10 +6,15 @@ const path = require("path")
   .replace(/\\/g, "/")
   .replace(appRoot, "");
 
-router.post(path + "/order", async (req, res) => {
+router.post(path + "/order", authenticateToken, async (req, res) => {
   try {
-    return res.status(200).json("test");
-  } catch (error) {}
+    const { body, userID } = req;
+    if (!isEmpty(userID) && ["buy", "sell"].includes(body.transactionType)) {
+    }
+    return res.status(200).json("success");
+  } catch (error) {
+    return res.status(500).json("error");
+  }
 });
 
 router.post(path + "/order/transfer", authenticateToken, async (req, res) => {
