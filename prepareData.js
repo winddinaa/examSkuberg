@@ -141,31 +141,9 @@ const initializeServer = async () => {
 
   try {
     // Clear data
-
     const destroyUsers = await model.users.destroy({
       where: {
         userID: { [Op.gt]: 0 },
-      },
-      transaction,
-    });
-
-    const destroyTypeTransaction = await model.typeTransaction.destroy({
-      where: {
-        typeTransactionID: { [Op.gt]: 0 },
-      },
-      transaction,
-    });
-
-    const destroyFiat = await model.fiat.destroy({
-      where: {
-        fiatID: { [Op.gt]: 0 },
-      },
-      transaction,
-    });
-
-    const destroyCrypto = await model.crypto.destroy({
-      where: {
-        cryptoID: { [Op.gt]: 0 },
       },
       transaction,
     });
@@ -184,6 +162,33 @@ const initializeServer = async () => {
       transaction,
     });
 
+    const destroyTransaction = await model.transaction.destroy({
+      where: {
+        transactionID: { [Op.gt]: 0 },
+      },
+      transaction,
+    });
+
+    await Promise.all(
+      initUser.map(async (itemUser) => {
+        await model.users.create(itemUser, { transaction });
+      })
+    );
+
+    // const destroyFiat = await model.fiat.destroy({
+    //   where: {
+    //     fiatID: { [Op.gt]: 0 },
+    //   },
+    //   transaction,
+    // });
+
+    // const destroyCrypto = await model.crypto.destroy({
+    //   where: {
+    //     cryptoID: { [Op.gt]: 0 },
+    //   },
+    //   transaction,
+    // });
+
     // const destroyStatus = await model.status.destroy({
     //   where: {
     //     statusID: { [Op.gt]: 0 },
@@ -191,24 +196,26 @@ const initializeServer = async () => {
     //   transaction,
     // });
 
+    // const destroyTypeTransaction = await model.typeTransaction.destroy({
+    //   where: {
+    //     typeTransactionID: { [Op.gt]: 0 },
+    //   },
+    //   transaction,
+    // });
+
     // Add data to table
-    await Promise.all(
-      initUser.map(async (itemUser) => {
-        await model.users.create(itemUser, { transaction });
-      })
-    );
 
-    await Promise.all(
-      initFiat.map(async (itemFiat) => {
-        await model.fiat.create(itemFiat, { transaction });
-      })
-    );
+    // await Promise.all(
+    //   initFiat.map(async (itemFiat) => {
+    //     await model.fiat.create(itemFiat, { transaction });
+    //   })
+    // );
 
-    await Promise.all(
-      initCrypto.map(async (itemCrypto) => {
-        await model.crypto.create(itemCrypto, { transaction });
-      })
-    );
+    // await Promise.all(
+    //   initCrypto.map(async (itemCrypto) => {
+    //     await model.crypto.create(itemCrypto, { transaction });
+    //   })
+    // );
 
     // await Promise.all(
     //   initStatus.map(async (itemStatus) => {
@@ -216,13 +223,13 @@ const initializeServer = async () => {
     //   })
     // );
 
-    await Promise.all(
-      initTypeTransaction.map(async (itemTypeTransaction) => {
-        await model.typeTransaction.create(itemTypeTransaction, {
-          transaction,
-        });
-      })
-    );
+    // await Promise.all(
+    //   initTypeTransaction.map(async (itemTypeTransaction) => {
+    //     await model.typeTransaction.create(itemTypeTransaction, {
+    //       transaction,
+    //     });
+    //   })
+    // );
 
     const crypto = await model.crypto.findAll({ transaction, raw: true });
     const fiat = await model.fiat.findAll({ transaction, raw: true });
@@ -266,16 +273,13 @@ const initializeServer = async () => {
     // Select data and log
 
     console.log("destroyUsers===>", destroyUsers);
-    console.log("destroyFiat===>", destroyFiat);
-    console.log("destroyCrypto===>", destroyCrypto);
-    console.log("destroyCryptoBags===>", destroyCryptoBags);
     console.log("destroyFiatBags===>", destroyFiatBags);
-    console.log("destroyStatus===>", destroyStatus);
-    console.log("destroyTypeTransaction===>", destroyTypeTransaction);
-
-    // console.log("checkFiat===>", checkFiat);
-    // console.log("checkFiat===>", checkFiat);
-    // console.log("checkCrypto===>", checkCrypto);
+    console.log("destroyTransaction===>", destroyTransaction);
+    // console.log("destroyFiat===>", destroyFiat);
+    // console.log("destroyCrypto===>", destroyCrypto);
+    console.log("destroyCryptoBags===>", destroyCryptoBags);
+    // console.log("destroyStatus===>", destroyStatus);
+    // console.log("destroyTypeTransaction===>", destroyTypeTransaction);
 
     await transaction.commit();
   } catch (error) {

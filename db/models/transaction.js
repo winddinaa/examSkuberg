@@ -17,6 +17,7 @@ module.exports = async (sequelize, DataTypes) => {
       statusID: { type: DataTypes.INTEGER, allowNull: false },
       transactionType: { type: DataTypes.STRING, allowNull: false },
       amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+      targetOrder: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
       refTransaction: { type: DataTypes.INTEGER, allowNull: true },
       created_at: {
         type: DataTypes.DATE,
