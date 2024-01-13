@@ -1,5 +1,4 @@
 const { throws } = require("assert");
-const { error } = require("console");
 const isEmpty = require("is-empty");
 
 const router = express.Router();
@@ -216,7 +215,6 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
         },
         raw: true,
       });
-      console.log("interestTransaction===>", interestTransaction);
       if (
         !isEmpty(interestTransaction) &&
         interestTransaction.transactionType === "sell" &&
@@ -371,11 +369,7 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
           },
           raw: true,
         });
-        console.log("reqCryptoBag=>", reqCryptoBag);
-        console.log(
-          "===>",
-          Number(reqCryptoBag.amount) >= Number(interestTransaction.amount)
-        );
+
         if (
           !isEmpty(reqCryptoBag) &&
           Number(reqCryptoBag.amount) >= Number(interestTransaction.amount)
@@ -511,7 +505,6 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
       throw new Error("Insufficient balance in your wallet.");
     }
   } catch (error) {
-    console.log("error=>", error);
     return res.status(500).json("error");
   }
 });
