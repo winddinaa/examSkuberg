@@ -6,7 +6,8 @@
 
 # run project
 
-ใช้คำสั่ง node server.js
+1. ใช้คำสั่ง npm install
+2. ใช้คำสั่ง node server.js
 
 # get data สำหรับ test
 
