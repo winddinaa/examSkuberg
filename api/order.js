@@ -1,4 +1,3 @@
-const { throws } = require("assert");
 const isEmpty = require("is-empty");
 
 const router = express.Router();
@@ -166,6 +165,7 @@ router.post(path + "/order/transfer", authenticateToken, async (req, res) => {
             },
             raw: true,
           });
+
           await model.cryptoBags.update(
             {
               ...fromBag,
@@ -195,12 +195,13 @@ router.post(path + "/order/transfer", authenticateToken, async (req, res) => {
           return res.status(200).json({ code: "success", data: tran });
         } catch (error) {
           await transaction.rollback();
-
-          res.status(500).json("error");
+          throw new Error(error);
         }
       }
     }
   } catch (error) {
+    console.log("error==>", error);
+
     res.status(500).json("error");
   }
 });
@@ -493,6 +494,7 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
             return res.status(200).json({ code: "success" });
           } catch (error) {
             await transaction.rollback();
+
             throw new Error(error);
           }
         } else {

@@ -26,10 +26,12 @@ router.post(path + "/auth/login", async (req, res) => {
       const token = jwtToken(bodyEncrypt);
       return res.status(200).json({ token: token });
     } else {
-      return res.status(400).json("invalid username or password");
+      return res
+        .status(400)
+        .json({ code: "error", message: "invalid username or password" });
     }
   } catch (error) {
-    return resError(error, res);
+    return res.status(500).json("Something wrong");
   }
 });
 

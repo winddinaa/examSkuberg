@@ -10,5 +10,24 @@
 
 # get data สำหรับ test
 
+db ใหม่
+ใช้คำสั่ง node prepareDataNewDB.js
+db ตามคอนฟิกของผม
 ใช้คำสั่ง node prepareData.js
-ถ้าไม่ได้ใช้ ดาต้าเบสของผมต้องไปเปิด comment ที่ไฟล์ prepareData 213-217, 187-192
+
+ในเมลจะมี env ของผม + คอลเล็คชั่นไปด้วยครับ
+
+# get tb สำหรับ ดูดาต้า
+
+เอาไว้ใช้ในเส้น ใส่ชื่อ tb ที่สนใจใน params
+http://localhost:3000/api/getDB/:tb
+[
+"cryptoBags",
+"cryptos",
+"fiat",
+"fiatBags",
+"status",
+"transaction",
+"typeTransaction",
+"users",
+];
