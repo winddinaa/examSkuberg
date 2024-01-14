@@ -5,6 +5,8 @@ const path = require("path")
   .resolve(__dirname)
   .replace(/\\/g, "/")
   .replace(appRoot, "");
+const TransactionService = require("./services/orderService");
+const transactionService = new TransactionService();
 
 router.post(path + "/order", authenticateToken, async (req, res) => {
   try {
@@ -31,90 +33,22 @@ router.post(path + "/order", authenticateToken, async (req, res) => {
         created_by: userID,
         statusID: 11,
       };
-      const transaction = await sequelize.transaction();
+
       try {
+        let tran;
         if (
           !isEmpty(body?.transactionType) &&
           body.transactionType === "sell"
         ) {
-          const fromCryptoBag = await model.cryptoBags.findOne({
-            where: {
-              userID: userID,
-              cryptoID: body?.cryptoID,
-              cryptoBagID: body?.ownerCryptoBagID,
-            },
-            raw: true,
-          });
-
-          if (
-            !isEmpty(fromCryptoBag) &&
-            Number(fromCryptoBag.amount) >= Number(body?.amount)
-          ) {
-            await model.cryptoBags.update(
-              {
-                ...fromCryptoBag,
-                amount: Number(fromCryptoBag.amount) - Number(body?.amount),
-                pendingAmount:
-                  Number(fromCryptoBag.pendingAmount) + Number(body?.amount),
-              },
-              {
-                transaction,
-                where: {
-                  cryptoBagID: fromCryptoBag?.cryptoBagID,
-                },
-              }
-            );
-
-            const tran = await model.transaction.create(tempTran, {
-              transaction,
-            });
-            await transaction.commit();
-            return res.status(200).json({ code: "success", data: tran });
-          } else {
-            throw new Error("Insufficient balance in your wallet.");
-          }
+          tran = transactionService.sellTransaction(userID, body, tempTran);
         } else if (
           !isEmpty(body?.transactionType) &&
           body.transactionType === "buy"
         ) {
-          const fromFiatBag = await model.fiatBags.findOne({
-            where: {
-              userID: userID,
-              fiatID: body?.fiatID,
-              fiatBagID: body?.ownerFiatBagID,
-            },
-            raw: true,
-          });
-          if (
-            !isEmpty(fromFiatBag) &&
-            Number(fromFiatBag.amount) >= Number(body?.amount)
-          ) {
-            await model.fiatBags.update(
-              {
-                ...fromFiatBag,
-                amount: Number(fromFiatBag.amount) - Number(body?.targetOrder),
-                pendingAmount:
-                  Number(fromFiatBag.pendingAmount) + Number(body?.targetOrder),
-              },
-              {
-                transaction,
-                where: {
-                  fiatBagID: fromFiatBag?.fiatBagID,
-                },
-              }
-            );
-
-            const tran = await model.transaction.create(tempTran, {
-              transaction,
-            });
-            await transaction.commit();
-            return res.status(200).json({ code: "success", data: tran });
-          } else {
-            throw new Error("Insufficient balance in your wallet.");
-          }
+          tran = transactionService.buyTransaction(userID, body, tempTran);
         }
+        return res.status(200).json({ code: "success", data: tran });
       } catch (error) {
-        await transaction.rollback();
         throw new Error(error);
       }
     } else {
