@@ -40,22 +40,30 @@ router.post(path + "/order", authenticateToken, async (req, res) => {
           !isEmpty(body?.transactionType) &&
           body.transactionType === "sell"
         ) {
-          tran = transactionService.sellTransaction(userID, body, tempTran);
+          tran = await transactionService.sellTransaction(
+            userID,
+            body,
+            tempTran
+          );
         } else if (
           !isEmpty(body?.transactionType) &&
           body.transactionType === "buy"
         ) {
-          tran = transactionService.buyTransaction(userID, body, tempTran);
+          tran = await transactionService.buyTransaction(
+            userID,
+            body,
+            tempTran
+          );
         }
         return res.status(200).json({ code: "success", data: tran });
       } catch (error) {
-        throw new Error(error);
+        throw error;
       }
     } else {
       throw new Error("Something wrong");
     }
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).json(error.message);
   }
 });
 
@@ -168,124 +176,16 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
           !isEmpty(reqFiatBag) &&
           Number(reqFiatBag.amount) >= Number(interestTransaction.targetOrder)
         ) {
-          const transaction = await sequelize.transaction();
-          const reqCryptoBag = await model.cryptoBags.findOne({
-            where: {
-              userID: userID,
-              cryptoID: interestTransaction?.cryptoID,
-            },
-            raw: true,
-          });
-          const ownerTransactionCryptoBag = await model.cryptoBags.findOne({
-            where: {
-              userID: interestTransaction?.userID,
-              cryptoID: interestTransaction?.cryptoID,
-            },
-            raw: true,
-          });
-          const ownerTransactionFiatBag = await model.fiatBags.findOne({
-            where: {
-              userID: interestTransaction?.userID,
-              fiatID: interestTransaction?.fiatID,
-            },
-            raw: true,
-          });
           try {
-            //update ยอด กระเป๋าเงินคนซือ
-            await model.fiatBags.update(
-              {
-                ...reqFiatBag,
-                amount:
-                  Number(reqFiatBag.amount) -
-                  Number(interestTransaction.targetOrder),
-              },
-              {
-                transaction,
-                where: {
-                  fiatBagID: reqFiatBag?.fiatBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าเงินคนขาย
-            await model.fiatBags.update(
-              {
-                ...ownerTransactionFiatBag,
-                amount:
-                  Number(reqFiatBag.amount) +
-                  Number(interestTransaction.targetOrder),
-              },
-              {
-                transaction,
-                where: {
-                  fiatBagID: ownerTransactionFiatBag?.fiatBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าคริปโตคนขาย
-            await model.cryptoBags.update(
-              {
-                ...ownerTransactionCryptoBag,
-                pendingAmount:
-                  Number(ownerTransactionCryptoBag.pendingAmount) -
-                  Number(interestTransaction.amount),
-              },
-              {
-                transaction,
-                where: {
-                  cryptoBagID: ownerTransactionCryptoBag?.cryptoBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าคริปโตคนซื้อ
-            await model.cryptoBags.update(
-              {
-                ...reqCryptoBag,
-                amount:
-                  Number(reqCryptoBag.amount) +
-                  Number(interestTransaction.amount),
-              },
-              {
-                transaction,
-                where: {
-                  cryptoBagID: reqCryptoBag?.cryptoBagID,
-                },
-              }
-            );
-            //created transaction โอนคริปโต
-            await model.transaction.create(
-              {
-                userID: userID,
-                cryptoID: interestTransaction?.cryptoID,
-                ownerCryptoBagID: reqCryptoBag.cryptoBagID,
-                transactionType: "transferOrder",
-                amount: interestTransaction?.amount,
-                targetCryptoBagID: interestTransaction?.userID,
-                statusID: 12,
-                created_by: userID,
-                updated_by: userID,
-                updated_at: new Date(),
-                refTransaction: interestTransaction?.transactionID,
-              },
-              {
-                transaction,
-              }
-            );
-            await model.transaction.update(
-              {
-                ...transaction,
-                statusID: 12,
-              },
-              {
-                transaction,
-                where: {
-                  transactionID: body?.transactionID,
-                },
-              }
-            );
-            await transaction.commit();
-            return res.status(200).json({ code: "success" });
+            const resultConfirm =
+              await transactionService.confirmSellTransaction(
+                userID,
+                body,
+                interestTransaction,
+                reqFiatBag
+              );
+            return res.status(200).json(resultConfirm);
           } catch (error) {
-            await transaction.rollback();
             throw new Error(error);
           }
         } else {
@@ -441,7 +341,7 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
       throw new Error("Insufficient balance in your wallet.");
     }
   } catch (error) {
-    return res.status(500).json("error");
+    return res.status(500).json(error.message);
   }
 });
 
