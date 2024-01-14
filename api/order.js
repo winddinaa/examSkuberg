@@ -209,126 +209,16 @@ router.post(path + "/order/Confirm", authenticateToken, async (req, res) => {
           !isEmpty(reqCryptoBag) &&
           Number(reqCryptoBag.amount) >= Number(interestTransaction.amount)
         ) {
-          const transaction = await sequelize.transaction();
-          const reqFiatBag = await model.fiatBags.findOne({
-            where: {
-              userID: userID,
-              fiatID: interestTransaction?.fiatID,
-            },
-            raw: true,
-          });
-          const ownerTransactionCryptoBag = await model.cryptoBags.findOne({
-            where: {
-              userID: interestTransaction?.userID,
-              cryptoID: interestTransaction?.cryptoID,
-            },
-            raw: true,
-          });
-          const ownerTransactionFiatBag = await model.fiatBags.findOne({
-            where: {
-              userID: interestTransaction?.userID,
-              fiatID: interestTransaction?.fiatID,
-            },
-            raw: true,
-          });
           try {
-            //update ยอด กระเป๋าเงินคนขาย
-            await model.fiatBags.update(
-              {
-                ...reqFiatBag,
-                amount:
-                  Number(reqFiatBag.amount) +
-                  Number(interestTransaction.targetOrder),
-              },
-              {
-                transaction,
-                where: {
-                  fiatBagID: reqFiatBag?.fiatBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าเงินคนขาย
-            await model.fiatBags.update(
-              {
-                ...ownerTransactionFiatBag,
-                pendingAmount:
-                  Number(ownerTransactionFiatBag.pendingAmount) -
-                  Number(interestTransaction.targetOrder),
-              },
-              {
-                transaction,
-                where: {
-                  fiatBagID: ownerTransactionFiatBag?.fiatBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าคริปโตคนซื้อ
-            await model.cryptoBags.update(
-              {
-                ...ownerTransactionCryptoBag,
-                amount:
-                  Number(ownerTransactionCryptoBag.amount) +
-                  Number(interestTransaction.amount),
-              },
-              {
-                transaction,
-                where: {
-                  cryptoBagID: ownerTransactionCryptoBag?.cryptoBagID,
-                },
-              }
-            );
-            //update ยอด กระเป๋าคริปโตคนขาย
-            await model.cryptoBags.update(
-              {
-                ...reqCryptoBag,
-                amount:
-                  Number(reqCryptoBag.amount) -
-                  Number(interestTransaction.amount),
-              },
-              {
-                transaction,
-                where: {
-                  cryptoBagID: reqCryptoBag?.cryptoBagID,
-                },
-              }
-            );
-
-            //created transaction โอนคริปโต
-            await model.transaction.create(
-              {
-                userID: userID,
-                cryptoID: interestTransaction?.cryptoID,
-                ownerCryptoBagID: interestTransaction.ownerCryptoBagID,
-                transactionType: "transferOrder",
-                amount: interestTransaction?.amount,
-                targetCryptoBagID: reqCryptoBag?.cryptoBagID,
-                statusID: 12,
-                created_by: userID,
-                updated_by: userID,
-                updated_at: new Date(),
-                refTransaction: interestTransaction?.transactionID,
-              },
-              {
-                transaction,
-              }
-            );
-            await model.transaction.update(
-              {
-                ...transaction,
-                statusID: 12,
-              },
-              {
-                transaction,
-                where: {
-                  transactionID: body?.transactionID,
-                },
-              }
-            );
-            await transaction.commit();
-            return res.status(200).json({ code: "success" });
+            const resultConfirm =
+              await transactionService.confirmBuyTransaction(
+                userID,
+                body,
+                interestTransaction,
+                reqCryptoBag
+              );
+            return res.status(200).json(resultConfirm);
           } catch (error) {
-            await transaction.rollback();
-
             throw new Error(error);
           }
         } else {
