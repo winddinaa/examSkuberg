@@ -82,69 +82,20 @@ router.post(path + "/order/transfer", authenticateToken, async (req, res) => {
       });
 
       if (!isEmpty(fromBag) && Number(fromBag.amount) >= Number(body?.amount)) {
-        const transaction = await sequelize.transaction();
         try {
-          const tempTran = {
-            userID: userID,
-            cryptoID: body?.cryptoID,
-            ownerCryptoBagID: body?.ownerCryptoBagID,
-            transactionType: body?.transactionType,
-            amount: body?.amount,
-            targetCryptoBagID: body?.targetCryptoBagID,
-            statusID: 12,
-            created_by: userID,
-            updated_by: userID,
-            updated_at: new Date(),
-          };
-          const tran = await model.transaction.create(tempTran, {
-            transaction,
-          });
-          const targetBag = await model.cryptoBags.findOne({
-            transaction,
-            where: {
-              cryptoID: body?.cryptoID,
-              cryptoBagID: body?.targetCryptoBagID,
-            },
-            raw: true,
-          });
-
-          await model.cryptoBags.update(
-            {
-              ...fromBag,
-              amount: Number(fromBag.amount) - Number(body?.amount),
-            },
-            {
-              transaction,
-              where: {
-                cryptoBagID: fromBag?.cryptoBagID,
-              },
-            }
+          const tran = transactionService.transferTransaction(
+            userID,
+            body,
+            fromBag
           );
-
-          await model.cryptoBags.update(
-            {
-              ...targetBag,
-              amount: Number(targetBag.amount) + Number(body?.amount),
-            },
-            {
-              transaction,
-              where: {
-                cryptoBagID: targetBag?.cryptoBagID,
-              },
-            }
-          );
-          await transaction.commit();
           return res.status(200).json({ code: "success", data: tran });
         } catch (error) {
-          await transaction.rollback();
-          throw new Error(error);
+          throw error;
         }
       }
     }
   } catch (error) {
-    console.log("error==>", error);
-
-    res.status(500).json("error");
+    res.status(500).json(error.message);
   }
 });
 

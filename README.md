@@ -32,3 +32,22 @@ http://localhost:3000/api/getDB/:tb
 "typeTransaction",
 "users",
 ];
+
+# ขั้นตอนการเทส
+
+- add users
+  API add user
+  มี validate ตัวเล็กตัวใหญ่, ตัวเลข2ตัว,ขั้นต่ำ 8, ไม่มีสเปค
+  http://localhost:3000/api/auth/login
+
+- add order
+  order buy and sell เป็นเส้นเดียวกันแยกกันตาม body
+  รายละเอียด body อยู่ ใน collection
+  http://localhost:3000/api/order
+
+- confirm order
+  order buy and sell เป็นเส้นเดียวกันแยกกันตาม
+  รายละเอียด body อยู่ ใน collection
+  http://localhost:3000/api/order/Confirm
+- transfer
+  http://localhost:3000/api/order/transfer

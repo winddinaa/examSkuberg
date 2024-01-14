@@ -336,6 +336,64 @@ class TransactionService {
       await transaction.rollback();
     }
   }
+  async transferTransaction(userID, body, fromBag) {
+    const transaction = await sequelize.transaction();
+    try {
+      const tempTran = {
+        userID: userID,
+        cryptoID: body?.cryptoID,
+        ownerCryptoBagID: body?.ownerCryptoBagID,
+        transactionType: body?.transactionType,
+        amount: body?.amount,
+        targetCryptoBagID: body?.targetCryptoBagID,
+        statusID: 12,
+        created_by: userID,
+        updated_by: userID,
+        updated_at: new Date(),
+      };
+      const tran = await model.transaction.create(tempTran, {
+        transaction,
+      });
+      const targetBag = await model.cryptoBags.findOne({
+        transaction,
+        where: {
+          cryptoID: body?.cryptoID,
+          cryptoBagID: body?.targetCryptoBagID,
+        },
+        raw: true,
+      });
+
+      await model.cryptoBags.update(
+        {
+          ...fromBag,
+          amount: Number(fromBag.amount) - Number(body?.amount),
+        },
+        {
+          transaction,
+          where: {
+            cryptoBagID: fromBag?.cryptoBagID,
+          },
+        }
+      );
+
+      await model.cryptoBags.update(
+        {
+          ...targetBag,
+          amount: Number(targetBag.amount) + Number(body?.amount),
+        },
+        {
+          transaction,
+          where: {
+            cryptoBagID: targetBag?.cryptoBagID,
+          },
+        }
+      );
+      await transaction.commit();
+      return tran;
+    } catch (error) {
+      await transaction.rollback();
+    }
+  }
 }
 
 module.exports = TransactionService;
