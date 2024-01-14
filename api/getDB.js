@@ -1,5 +1,4 @@
-const { error } = require("console");
-
+const dbService = require("./services/getDBService");
 const router = express.Router();
 const path = require("path")
   .resolve(__dirname)
@@ -20,8 +19,9 @@ router.get(path + "/getDB/:tb", async (req, res) => {
       "typeTransaction",
       "users",
     ];
+
     if (tbList.includes(tb)) {
-      const data = await model[tb].findAll();
+      const data = await dbService.getTableData(tb);
       return res.status(200).json({ code: "success", data });
     } else {
       throw new Error("db not found");

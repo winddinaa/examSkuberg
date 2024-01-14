@@ -20,7 +20,7 @@ const authService = {
         const token = jwtToken(bodyEncrypt);
         return token;
       } else {
-        throw new Error("db not found");
+        throw new Error("Invalid Username or Password");
       }
     } catch (error) {
       throw error;
