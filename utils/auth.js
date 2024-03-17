@@ -1,10 +1,20 @@
 var CryptoJS = require("crypto-js");
 var jwt = require("jsonwebtoken");
 
-const key = CryptoJS.PBKDF2(process.env.SECRET_KEY, process.env.SALT, {
-  keySize: 128 / 32,
-  iterations: 1000,
-}).toString();
+const generateKey = () => {
+  try {
+    const key = CryptoJS.PBKDF2(process.env.SECRET_KEY, process.env.SALT, {
+      keySize: 128 / 32,
+      iterations: 1000,
+    }).toString();
+    return key;
+  } catch (error) {
+    console.error("Error generating key:", error);
+    return null;
+  }
+};
+
+const key = generateKey();
 
 const jwtToken = (dataEncrypt) => {
   return jwt.sign(dataEncrypt, key, {
