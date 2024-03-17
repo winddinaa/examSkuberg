@@ -5,7 +5,7 @@ const path = require("path")
   .resolve(__dirname)
   .replace(/\\/g, "/")
   .replace(appRoot, "");
-const TransactionService = require("./services/orderService");
+const TransactionService = require("../services/orderService");
 const transactionService = new TransactionService();
 
 router.post(path + "/order", authenticateToken, async (req, res) => {

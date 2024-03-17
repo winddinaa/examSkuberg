@@ -1,4 +1,4 @@
-const authService = require("./services/authService");
+const authService = require("../services/authService");
 const router = express.Router();
 const path = require("path")
   .resolve(__dirname)

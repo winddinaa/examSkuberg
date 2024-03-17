@@ -4,7 +4,7 @@ const path = require("path")
   .replace(/\\/g, "/")
   .replace(appRoot, "");
 const isEmpty = require("is-empty");
-const userService = require("./services/usersService");
+const userService = require("../services/usersService");
 
 var passwordValidator = require("password-validator");
 var schema = new passwordValidator();

@@ -1,5 +1,5 @@
 const isEmpty = require("is-empty");
-const { jwtToken } = require("../../utils/auth");
+const { jwtToken } = require("../utils/auth");
 
 const authService = {
   loginUser: async (username, password) => {

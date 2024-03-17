@@ -1,4 +1,4 @@
-const dbService = require("./services/getDBService");
+const dbService = require("../services/getDBService");
 const router = express.Router();
 const path = require("path")
   .resolve(__dirname)
